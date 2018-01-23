@@ -86,6 +86,9 @@ public class FTPSampler extends AbstractSampler implements Interruptible {
     // Should the file data be saved in the response?
     public static final String SAVE_RESPONSE = "FTPSampler.saveresponse"; // $NON-NLS-1$
 
+
+	public static final String ACTIVE_MODE = "FTPSampler.modeactive"; // $NON-NLS-1$
+
     private transient volatile FTPClient savedClient; // used for interrupting the sampler
 
     public FTPSampler() {
@@ -137,6 +140,10 @@ public class FTPSampler extends AbstractSampler implements Interruptible {
 
     public boolean isSaveResponse(){
         return getPropertyAsBoolean(SAVE_RESPONSE,false);
+    }
+
+    public boolean isModeActive(){
+        return getPropertyAsBoolean(ACTIVE_MODE,false);
     }
 
     public boolean isUpload(){
@@ -196,13 +203,22 @@ public class FTPSampler extends AbstractSampler implements Interruptible {
             }
             res.latencyEnd();
             int reply = ftp.getReplyCode();
-            if (FTPReply.isPositiveCompletion(reply)) {
+            if (FTPReply.isPositiveCompletion(reply))
+            {
                 if (ftp.login( getUsername(), getPassword())){
                     if (binaryTransfer) {
                         ftp.setFileType(FTP.BINARY_FILE_TYPE);
                     }
+                    if(isModeActive())
+                    {
+                    	ftp.enterLocalActiveMode();
+                    }
+                    else
+                    {
                     ftp.enterLocalPassiveMode();// should probably come from the setup dialog
+                    }
                     boolean ftpOK=false;
+                    
                     if (isUpload()) {
                         String contents=getLocalFileContents();
                         if (contents.length() > 0){
@@ -244,8 +260,11 @@ public class FTPSampler extends AbstractSampler implements Interruptible {
                             } else {
                                 long bytes = IOUtils.copy(input,target);
                                 ftpOK = bytes > 0;
-                                if (saveResponse) {
-                                    saveResponse(res, binaryTransfer, baos);
+                                if (saveResponse && baos != null){
+                                    res.setResponseData(baos.toByteArray());
+                                    if (!binaryTransfer) {
+                                        res.setDataType(SampleResult.TEXT);
+                                    }
                                 } else {
                                     res.setBytes(bytes);
                                 }

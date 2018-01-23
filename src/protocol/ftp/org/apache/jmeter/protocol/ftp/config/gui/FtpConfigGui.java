@@ -54,6 +54,8 @@ public class FtpConfigGui extends AbstractConfigGui {
 
     private JCheckBox saveResponseData;
 
+    private JCheckBox activeMode;
+
     private boolean displayName = true;
 
     private JRadioButton getBox;
@@ -85,6 +87,7 @@ public class FtpConfigGui extends AbstractConfigGui {
         inputData.setText(element.getPropertyAsString(FTPSampler.INPUT_DATA));
         binaryMode.setSelected(element.getPropertyAsBoolean(FTPSampler.BINARY_MODE, false));
         saveResponseData.setSelected(element.getPropertyAsBoolean(FTPSampler.SAVE_RESPONSE, false));
+        activeMode.setSelected(element.getPropertyAsBoolean(FTPSampler.ACTIVE_MODE, false));
         final boolean uploading = element.getPropertyAsBoolean(FTPSampler.UPLOAD_FILE,false);
         if (uploading){
             putBox.setSelected(true);
@@ -116,6 +119,7 @@ public class FtpConfigGui extends AbstractConfigGui {
         element.setProperty(FTPSampler.INPUT_DATA,inputData.getText());
         element.setProperty(FTPSampler.BINARY_MODE,binaryMode.isSelected());
         element.setProperty(FTPSampler.SAVE_RESPONSE, saveResponseData.isSelected());
+        element.setProperty(FTPSampler.ACTIVE_MODE, activeMode.isSelected());
         element.setProperty(FTPSampler.UPLOAD_FILE,putBox.isSelected());
     }
 
@@ -133,6 +137,7 @@ public class FtpConfigGui extends AbstractConfigGui {
         inputData.setText(""); //$NON-NLS-1$
         binaryMode.setSelected(false);
         saveResponseData.setSelected(false);
+        activeMode.setSelected(false);
         getBox.setSelected(true);
         putBox.setSelected(false);
     }
@@ -211,6 +216,7 @@ public class FtpConfigGui extends AbstractConfigGui {
 
         binaryMode = new JCheckBox(JMeterUtils.getResString("ftp_binary_mode")); //$NON-NLS-1$
         saveResponseData = new JCheckBox(JMeterUtils.getResString("ftp_save_response_data")); //$NON-NLS-1$
+        activeMode = new JCheckBox(JMeterUtils.getResString("ftp_mode_active_data")); //$NON-NLS-1$
 
 
         JPanel optionsPanel = new HorizontalPanel();
@@ -218,6 +224,7 @@ public class FtpConfigGui extends AbstractConfigGui {
         optionsPanel.add(putBox);
         optionsPanel.add(binaryMode);
         optionsPanel.add(saveResponseData);
+        optionsPanel.add(activeMode);
         return optionsPanel;
     }
     private void init() { // WARNING: called from ctor so must not be overridden (i.e. must be private or final)
